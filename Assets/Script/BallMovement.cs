@@ -8,6 +8,8 @@ public class BallMovement : MonoBehaviour
     private Rigidbody rb;
 
     private LineRenderer lr;
+
+    public bool dragStart;
     private void Start()
     {
         rb = GetComponent<Rigidbody>(); // Topun RigidBody bileþeni alýnýr
@@ -16,18 +18,29 @@ public class BallMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Fare sol tuþuna basýldýðýnda
+        if (Input.GetMouseButtonDown(0))
+        {
+            
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+
+            lr.SetPosition(0, transform.position);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit raycastHit))
+            {
+                lr.SetPosition(1, raycastHit.point);
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0)) // Fare sol tuþuna basýldýðýnda
         {
             Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
             rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
         }
 
-        lr.SetPosition(0, transform.position);
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit raycastHit))
-        {
-            lr.SetPosition(1, raycastHit.point);
-        }
+        
     }
 
     private Vector3 CalculateForce()
