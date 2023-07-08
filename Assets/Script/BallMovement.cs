@@ -4,15 +4,52 @@ using UnityEngine;
 
 public class BallMovement : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public float power = 10f; // Topa uygulanacak güç
+    private Rigidbody rb;
+
+    private LineRenderer lr;
+    private void Start()
     {
-        
+        rb = GetComponent<Rigidbody>(); // Topun RigidBody bileþeni alýnýr
+        lr = GetComponent<LineRenderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        if (Input.GetMouseButtonDown(0)) // Fare sol tuþuna basýldýðýnda
+        {
+            Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
+            rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
+        }
+
+        lr.SetPosition(0, transform.position);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit raycastHit))
+        {
+            lr.SetPosition(1, raycastHit.point);
+        }
+    }
+
+    private Vector3 CalculateForce()
+    {
+        // Topa uygulanacak gücün yönünü ve büyüklüðünü hesaplar
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Vector3 hitPoint = hit.point;
+            Vector3 ballPosition = transform.position;
+            Vector3 forceDirection = hitPoint - ballPosition;
+            forceDirection.Normalize();
+
+            float distance = Vector3.Distance(hitPoint, ballPosition);
+            float forceMagnitude = Mathf.Clamp(distance, 0f, 10f) * power;
+
+            return forceDirection * forceMagnitude;
+        }
+
+        return Vector3.zero;
     }
 }
