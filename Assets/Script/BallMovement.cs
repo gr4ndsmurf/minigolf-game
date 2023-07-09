@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BallMovement : MonoBehaviour
 {
@@ -9,7 +10,6 @@ public class BallMovement : MonoBehaviour
 
     private LineRenderer lr;
 
-    public bool dragStart;
     private void Start()
     {
         rb = GetComponent<Rigidbody>(); // Topun RigidBody bileþeni alýnýr
@@ -20,12 +20,10 @@ public class BallMovement : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            
+            lr.enabled = true;
         }
-
         if (Input.GetMouseButton(0))
         {
-
             lr.SetPosition(0, transform.position);
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit raycastHit))
@@ -38,6 +36,7 @@ public class BallMovement : MonoBehaviour
         {
             Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
             rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
+            lr.enabled = false;
         }
 
         
@@ -65,4 +64,13 @@ public class BallMovement : MonoBehaviour
 
         return Vector3.zero;
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "deadzone")
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
 }
