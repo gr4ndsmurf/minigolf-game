@@ -7,13 +7,14 @@ public class BallMovement : MonoBehaviour
 {
     public float power = 10f; // Topa uygulanacak güç
     private Rigidbody rb;
-
     private LineRenderer lr;
 
+    public int click;
     private void Start()
     {
         rb = GetComponent<Rigidbody>(); // Topun RigidBody bileþeni alýnýr
         lr = GetComponent<LineRenderer>();
+        click = 0;
     }
 
     private void Update()
@@ -37,6 +38,7 @@ public class BallMovement : MonoBehaviour
             Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
             rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
             lr.enabled = false;
+            click++;
         }
 
         
