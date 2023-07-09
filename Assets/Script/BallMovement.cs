@@ -10,6 +10,13 @@ public class BallMovement : MonoBehaviour
     private LineRenderer lr;
 
     public int click;
+
+    public bool groundCheck;
+
+    public AudioSource ballHitSound;
+    public AudioSource obstacleHitSound;
+    public AudioSource deadzoneSound;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>(); // Topun RigidBody bileþeni alýnýr
@@ -19,26 +26,30 @@ public class BallMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (groundCheck)
         {
-            lr.enabled = true;
-        }
-        if (Input.GetMouseButton(0))
-        {
-            lr.SetPosition(0, transform.position);
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit raycastHit))
+            if (Input.GetMouseButtonDown(0))
             {
-                lr.SetPosition(1, raycastHit.point);
+                lr.enabled = true;
             }
-        }
+            if (Input.GetMouseButton(0))
+            {
+                lr.SetPosition(0, transform.position);
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit raycastHit))
+                {
+                    lr.SetPosition(1, raycastHit.point);
+                }
+            }
 
-        if (Input.GetMouseButtonUp(0)) // Fare sol tuþuna basýldýðýnda
-        {
-            Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
-            rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
-            lr.enabled = false;
-            click++;
+            if (Input.GetMouseButtonUp(0)) // Fare sol tuþuna basýldýðýnda
+            {
+                Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
+                rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
+                lr.enabled = false;
+                click++;
+                ballHitSound.Play();
+            }
         }
 
         
@@ -71,8 +82,34 @@ public class BallMovement : MonoBehaviour
     {
         if (collision.transform.tag == "deadzone")
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            deadzoneSound.Play();
+            rb.constraints = RigidbodyConstraints.FreezePosition;
+            StartCoroutine(loadCurrentScene());
+        }
+        if (collision.transform.tag == "Obstacle")
+        {
+            obstacleHitSound.Play();
+        }
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.transform.tag == "Obstacle")
+        {
+            groundCheck = true;
         }
     }
 
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.transform.tag == "Obstacle")
+        {
+            groundCheck = false;
+        }
+    }
+
+    IEnumerator loadCurrentScene()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }
