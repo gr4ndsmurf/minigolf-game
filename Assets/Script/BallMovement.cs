@@ -38,14 +38,16 @@ public class BallMovement : MonoBehaviour
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit raycastHit))
                 {
-                    lr.SetPosition(1, raycastHit.point);
+                    Vector3 lrPos2 = new Vector3(raycastHit.point.x, transform.position.y, raycastHit.point.z);
+                    lr.SetPosition(1, lrPos2);
                 }
             }
 
             if (Input.GetMouseButtonUp(0)) // Fare sol tuþuna basýldýðýnda
             {
                 Vector3 force = CalculateForce(); // Uygulanacak güç hesaplanýr
-                rb.AddForce(-force, ForceMode.Impulse); // Güç topa uygulanýr
+                Vector3 addForce = new Vector3(-force.x, 0, -force.z);
+                rb.AddForce(addForce, ForceMode.Impulse); // Güç topa uygulanýr
                 lr.enabled = false;
                 click++;
                 ballHitSound.Play();
