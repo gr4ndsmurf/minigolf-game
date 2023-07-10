@@ -14,11 +14,14 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text clickText;
     public TMP_Text levelText;
+
+    public GameObject compPanel;
     // Start is called before the first frame update
     void Start()
     {
         bm = GameObject.FindGameObjectWithTag("Player").GetComponent<BallMovement>();
         levelText.text = SceneManager.GetActiveScene().buildIndex.ToString();
+        compPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -33,6 +36,7 @@ public class GameManager : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             nextlevelSound.Play();
+            compPanel.SetActive(true);
             StartCoroutine(loadNextScene());
             ballRB = bm.gameObject.GetComponent<Rigidbody>();
             ballRB.constraints = RigidbodyConstraints.FreezePosition;
@@ -43,5 +47,10 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void restartDemo()
+    {
+        SceneManager.LoadScene("Main Menu");
     }
 }
